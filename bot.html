@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blackjack Game</title>
+</head>
+<body>
+    <h1>Blackjack Game</h1>
+
+    <div>
+        <h2>Your Hand:</h2>
+        <div id="playerHand"></div>
+        <p>Total: <span id="playerTotal">0</span></p>
+    </div>
+
+    <div>
+        <h2>Dealer's Hand:</h2>
+        <div id="dealerHand"></div>
+        <p>Total: <span id="dealerTotal">0</span></p>
+    </div>
+
+    <form id="gameForm">
+        <button type="button" onclick="startGame()">Start Game</button>
+        <button type="button" onclick="hit()">Hit</button>
+        <button type="button" onclick="stand()">Stand</button>
+    </form>
+
+    <script>
+        const playerHand = document.getElementById('playerHand');
+        const playerTotal = document.getElementById('playerTotal');
+        const dealerHand = document.getElementById('dealerHand');
+        const dealerTotal = document.getElementById('dealerTotal');
+        const gameForm = document.getElementById('gameForm');
+
+        const cardValues = {
+            'Ace': 11, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10,
+            'Jack': 10, 'Queen': 10, 'King': 10
+        };
+
+        let playerCards = [];
+        let dealerCards = [];
+
+        function startGame() {
+            playerCards = [drawCard(), drawCard()];
+            dealerCards = [drawCard()];
+
+            updateHands();
+            gameForm.style.display = 'none';
+        }
+
+        function hit() {
+            playerCards.push(drawCard());
+            updateHands();
+        }
+
+        function stand() {
+            while (calculateTotal(dealerCards) < 17) {
+                dealerCards.push(drawCard());
+            }
+            updateHands();
+        }
+
+        function drawCard() {
+            const cards = Object.keys(cardValues);
+            const randomCard = cards[Math.floor(Math.random() * cards.length)];
+            return randomCard;
+        }
+
+        function calculateTotal(cards) {
+            let total = 0;
+            let numAces = 0;
+
+            cards.forEach(card => {
+                total += cardValues[card];
+                if (card === 'Ace') {
+                    numAces++;
+                }
+            });
+
+            while (total > 21 && numAces > 0) {
+                total -= 10;
+                numAces--;
+            }
+
+            return total;
+        }
+
+        function updateHands() {
+            playerHand.textContent = 'Player Hand: ' + playerCards.join(', ');
+            playerTotal.textContent = calculateTotal(playerCards);
+
+            dealerHand.textContent = 'Dealer Hand: ' + dealerCards.join(', ');
+            dealerTotal.textContent = calculateTotal(dealerCards);
+
+            if (calculateTotal(playerCards) >= 21 || calculateTotal(dealerCards) >= 17) {
+                gameForm.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
